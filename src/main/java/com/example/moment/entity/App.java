@@ -1,7 +1,6 @@
 package com.example.moment.entity;
 
 import com.example.moment.baseTime.BaseTimeEntity;
-import io.micrometer.core.annotation.Counted;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,27 +23,16 @@ public class App extends BaseTimeEntity {
     @Column(name = "account_status")
     private Boolean accountStatus;
 
-    @Column(name = "did")
-    private String did;
 
-    @Column(name="public_key")
-    private String publicKey;
 
     @Builder
-    public App(Long appId, String claim, Boolean accountStatus, String did, String publicKey) {
+    public App(Long appId, String claim, Boolean accountStatus) {
         this.appId = appId;
         this.claim = claim;
         this.accountStatus = accountStatus;
-        this.did = did;
-        this.publicKey = publicKey;
     }
-
-
-
 
     public void updateAccountStatus() {
         this.accountStatus = true;
     }
-    public void registDidInfo(String did) {this.did = did;}
-    public void registPublicKey(String publicKey) {this.publicKey = publicKey;}
 }

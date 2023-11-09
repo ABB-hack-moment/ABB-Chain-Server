@@ -2,30 +2,26 @@ package com.example.moment.service;
 
 import com.example.moment.dto.AccountDto;
 import com.example.moment.dto.ReqIssueDto;
+import com.example.moment.dto.ReqItemDto;
 import com.example.moment.entity.App;
+import com.example.moment.entity.Item;
 import com.example.moment.handler.CustomException;
 import com.example.moment.handler.StatusCode;
 import com.example.moment.repository.AppRepository;
+import com.example.moment.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
+
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 import java.util.HashMap;
 
 @Service
@@ -39,6 +35,7 @@ public class DidServiceImpl implements DidService {
 
     private final RestTemplate restTemplate;
     private final AppRepository appRepository;
+    private final ItemRepository itemRepository;
 
     @Override
     @Transactional
@@ -50,37 +47,10 @@ public class DidServiceImpl implements DidService {
         HashMap result = (HashMap) restTemplate.postForObject(createAccountURI, createAccountBody(), HashMap.class).get("data");
         AccountDto accountDto = extractAccountDto(result);
 
-        appRepository.findByClaim(reqRegistAccountMap.get("value").toString()).get().registDidInfo(accountDto.getDid());
-
         return accountDto;
     }
 
-    @Override
-    public void registPublicKey(HashMap reqRegistKeyMap) {
-        App app = appRepository.findByDid(reqRegistKeyMap.get("did").toString()).orElseThrow(() ->  new CustomException(StatusCode.NON_EXIST_DID));
-        app.registPublicKey(reqRegistKeyMap.get("publicKey").toString());
-    }
 
-    @Override
-    public Boolean verifySignedData(HashMap verifyDataMap) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, UnsupportedEncodingException, SignatureException {
-        String encryptedData = verifyDataMap.get("signedData").toString();
-        App app = appRepository.findByDid(verifyDataMap.get("did").toString()).orElseThrow(() -> new CustomException(StatusCode.NON_EXIST_DID));
-//        System.out.println(app);
-//        System.out.println("db publicKey: " + publicKey);
-//        byte[] publicKeyBytes = Base64.getDecoder().decode(publicKey);
-//        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
-//        System.out.println("spect public Key: " + publicKeySpec);
-//        KeyFactory keyFactory = KeyFactory.getInstance("EC");
-//        PublicKey targetPublicKey = keyFactory.generatePublic(publicKeySpec);
-//        System.out.println("target public key: " + targetPublicKey);
-//        Signature ecdsaVerify = Signature.getInstance("SHA256withECDSA");
-//        ecdsaVerify.initVerify(targetPublicKey);
-//        ecdsaVerify.update(encryptedData.getBytes("UTF-8"));
-//
-//        boolean result = ecdsaVerify.verify(publicKeyBytes);
-//        System.out.println("result: " + result);
-        return false;
-    }
 
     @Override
     public HashMap issueVP(HashMap reqIssueVPMap) {
@@ -103,23 +73,18 @@ public class DidServiceImpl implements DidService {
     }
 
     @Override
-    public Boolean verifyVP(String didToken) {
-        final String targetDid = tokenDecoder(didToken).split(",")[3].substring(6).split("\"")[1];
-
+    @Transactional
+    public Boolean verifyVP(String didToken, ReqItemDto reqItemDto) {
         String verifyVPURI = semiURI + "verification";
         HashMap result = restTemplate.postForObject(verifyVPURI, createVerifyVPBody(didToken), HashMap.class);
 
-        String verifiedDid = ((HashMap) result.get("data")).get("aud").toString();
-        System.out.println(targetDid);
-        System.out.println(verifiedDid);
-        if (targetDid.equals(verifiedDid)) return true;
+        if (result.get("status").equals("OOPS")) return false;
 
-        return false;
-    }
 
-    private String tokenDecoder(String didToken) {
-        String[] parts = didToken.split("\\.");
-        return new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+        Item item =  itemRepository.findByItemId(reqItemDto.getItemId()).orElseThrow(() -> new CustomException(StatusCode.ITEM_NOT_FOUND));
+        item.updateStatus(reqItemDto.getStatus());
+
+        return true;
     }
 
     private void vcVerifier(String vc) {

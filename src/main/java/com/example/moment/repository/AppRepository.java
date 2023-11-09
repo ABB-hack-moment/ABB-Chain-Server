@@ -10,5 +10,4 @@ import java.util.Optional;
 public interface AppRepository extends JpaRepository<App, Long> {
     Optional<App> findByClaim(String claim);
 
-    Optional<App> findByDid(String did);
 }
