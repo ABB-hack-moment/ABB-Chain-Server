@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://chae-database.ctdnizanjl5z.ap-northeast-2.rds.amazonaws.com:3306/abb_chain?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: chae
+    password: chaechae01
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+
+dgChain:
+  token: "c582068df55078d90b1136ec2e905147"
+  chain: "mitumt"
+  key: "moment"
+  templateId: "85039435947282203433"
+  didOrigin: "http://175.106.96.224:3398/v1/mitumt/did/"
