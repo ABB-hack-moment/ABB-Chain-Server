@@ -41,12 +41,14 @@ public class DidServiceImpl implements DidService {
     @Transactional
     public AccountDto createAccount(HashMap reqRegistAccountMap) {
         String createAccountURI = semiURI + "create_account";
+        System.out.println("create Account IN");
+        System.out.println(reqRegistAccountMap);
 
         vcVerifier(reqRegistAccountMap.get("value").toString());
 
         HashMap result = (HashMap) restTemplate.postForObject(createAccountURI, createAccountBody(), HashMap.class).get("data");
         AccountDto accountDto = extractAccountDto(result);
-
+        System.out.println(accountDto);
         return accountDto;
     }
 
@@ -55,6 +57,7 @@ public class DidServiceImpl implements DidService {
     @Override
     public HashMap issueVP(HashMap reqIssueVPMap) {
         String issueVPURI = semiURI + "issue";
+        System.out.println(reqIssueVPMap);
         ReqIssueDto reqIssueDto = ReqIssueDto.builder()
                 .token(adminToken)
                 .chain(chainName)
@@ -68,13 +71,14 @@ public class DidServiceImpl implements DidService {
 
         HashMap<String, String> jwt = new HashMap<>();
         jwt.put("jwt", ((HashMap) result.get("data")).get("jwt").toString());
-
+        System.out.println(jwt);
         return jwt;
     }
 
     @Override
     @Transactional
     public Boolean verifyVP(String didToken, ReqItemDto reqItemDto) {
+        System.out.println("verifyVP IN");
         String verifyVPURI = semiURI + "verification";
         HashMap result = restTemplate.postForObject(verifyVPURI, createVerifyVPBody(didToken), HashMap.class);
 
@@ -83,7 +87,7 @@ public class DidServiceImpl implements DidService {
 
         Item item =  itemRepository.findByItemId(reqItemDto.getItemId()).orElseThrow(() -> new CustomException(StatusCode.ITEM_NOT_FOUND));
         item.updateStatus(reqItemDto.getStatus());
-
+        System.out.println(item.toString());
         return true;
     }
 

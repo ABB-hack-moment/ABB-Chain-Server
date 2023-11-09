@@ -18,11 +18,13 @@ public class DidController {
 
     @PostMapping("/registration")
     public ResponseEntity<Message> registAccount(@RequestBody HashMap<String, String> reqRegistAccountMap) {
+        System.out.println("registAccountController IN");
         return ResponseEntity.ok(new Message(StatusCode.OK, didService.createAccount(reqRegistAccountMap)));
     }
 
     @PostMapping("/issue")
     public ResponseEntity<Message> issueVP(@RequestBody HashMap<String, String> reqIssueVPMap) {
+        System.out.println("issueVP IN");
         return ResponseEntity.ok(new Message(StatusCode.OK, didService.issueVP(reqIssueVPMap)));
     }
 
