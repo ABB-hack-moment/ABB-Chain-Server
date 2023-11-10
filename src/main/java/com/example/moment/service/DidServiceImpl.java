@@ -9,6 +9,10 @@ import com.example.moment.handler.CustomException;
 import com.example.moment.handler.StatusCode;
 import com.example.moment.repository.AppRepository;
 import com.example.moment.repository.ItemRepository;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 
@@ -17,12 +21,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +62,7 @@ public class DidServiceImpl implements DidService {
 
 
     @Override
-    public HashMap issueVP(HashMap reqIssueVPMap) {
+    public HashMap issueVP(HashMap reqIssueVPMap) throws IOException {
         String issueVPURI = semiURI + "issue";
         System.out.println(reqIssueVPMap);
         ReqIssueDto reqIssueDto = ReqIssueDto.builder()
@@ -69,10 +76,8 @@ public class DidServiceImpl implements DidService {
                 .build();
         HashMap result = restTemplate.postForObject(issueVPURI, reqIssueDto, HashMap.class);
 
-        HashMap<String, String> jwt = new HashMap<>();
-        jwt.put("jwt", ((HashMap) result.get("data")).get("jwt").toString());
-        System.out.println(jwt);
-        return jwt;
+        System.out.println(result);
+        return result;
     }
 
     @Override

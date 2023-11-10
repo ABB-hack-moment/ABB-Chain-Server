@@ -2,6 +2,7 @@ package com.example.moment.service;
 
 import com.example.moment.dto.AccountDto;
 import com.example.moment.dto.ReqItemDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.HashMap;
 public interface DidService {
     AccountDto createAccount(HashMap reqRegistAccountMap);
 
-    HashMap issueVP(HashMap reqIssueVPMap);
+    HashMap issueVP(HashMap reqIssueVPMap) throws IOException;
 
     Boolean verifyVP(String didToken, ReqItemDto reqItemDto);
 }

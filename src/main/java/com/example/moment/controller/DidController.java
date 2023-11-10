@@ -4,10 +4,12 @@ import com.example.moment.dto.Message;
 import com.example.moment.dto.ReqItemDto;
 import com.example.moment.handler.StatusCode;
 import com.example.moment.service.DidService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class DidController {
     }
 
     @PostMapping("/issue")
-    public ResponseEntity<Message> issueVP(@RequestBody HashMap<String, String> reqIssueVPMap) {
+    public ResponseEntity<Message> issueVP(@RequestBody HashMap<String, String> reqIssueVPMap) throws IOException {
         System.out.println("issueVP IN");
         return ResponseEntity.ok(new Message(StatusCode.OK, didService.issueVP(reqIssueVPMap)));
     }
