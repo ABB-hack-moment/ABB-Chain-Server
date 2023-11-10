@@ -32,6 +32,7 @@ public class DidController {
 
     @PostMapping("/verification")
     public ResponseEntity<Message> verifyVP(@RequestHeader("Authorization") String didToken, @RequestBody ReqItemDto reqItemDto) {
-        return ResponseEntity.ok(new Message(StatusCode.OK, didService.verifyVP(didToken.split(" ")[1], reqItemDto)));
+//        return ResponseEntity.ok(new Message(StatusCode.OK, didService.verifyVP(didToken.split(" ")[1], reqItemDto)));
+        return ResponseEntity.ok(new Message(StatusCode.OK, didService.verifyVP(didToken, reqItemDto)));
     }
 }
